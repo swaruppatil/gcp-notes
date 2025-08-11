@@ -25,8 +25,8 @@ In GCP, everything you create (VMs, buckets, databases, etc.) lives inside a **p
 - You can have multiple projects under the same billing account.
 
 Use-case:
-- One project for dev
-- Another for prod
+- One project for payments team.
+- Another for shipment team.
 
 ---
 
