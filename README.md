@@ -27,7 +27,7 @@
 
 ---
 
-## Day-4: Compute Engine – VMs, SSH, Types of Compute
+## Day-4: Compute Engine – VMs, SSH, Types of Compute, Region, Zone and much more
 
 - Launch VMs, connect via SSH
 - Install packages via startup scripts
