@@ -1,97 +1,134 @@
-# Day-02: GCP Project Setup and Billing
-
----
-
-## What You Will Learn Today
-
-- GCP Hierarchy
-- What is a GCP project and why it's needed
-- How billing accounts work in GCP
-- Setting budget alerts to avoid unexpected charges
-- Enabling APIs required for your workloads
-
----
+# 🚀 Day-02: GCP Project Setup & Billing
 
 ## GCP Hierarchy
 
 <img width="1024" height="1024" alt="GCP Resource Hierarchy Flowchart" src="https://github.com/user-attachments/assets/c1d9b947-bf12-4b30-9df6-df3491dc01a8" />
 
+### Structure
+**Organization → Folders → Projects → Resources**
+
+- **Organization**: 
+  - Represents your company or enterprise. 
+  - Root node for managing billing, IAM, and policies across the entire org.  
+- **Folders**: 
+  - Optional grouping mechanism.  
+  - Used for teams, departments, or environments (e.g., `Finance`, `IT`, `Production`).  
+  - Policies/permissions applied here flow down to projects inside.  
+- **Projects**: 
+  - The **core container** where all resources (VMs, buckets, DBs) live.  
+  - Has its own **Project ID, IAM roles, APIs, and Billing**.  
+- **Resources**: 
+  - Actual GCP services like **VMs, Storage Buckets, Pub/Sub, BigQuery**.  
+  - Can only exist inside a **project**.  
+
+⚡ **Policy Inheritance**: IAM roles, billing permissions, and org policies **flow top → down**.  
+Ex: IAM role at Organization → available at Folder → Project → Resource.  
+
+---
+
 ## Understanding GCP Projects
 
-In GCP, everything you create (VMs, buckets, databases, etc.) lives inside a **project**.
+In GCP, everything you create (VMs, buckets, databases, APIs, IAM) lives inside a **project**.  
+Think of it as a **logical folder** that defines **ownership, billing, IAM, and quotas**.
 
-- Think of a **project** as a folder where all your cloud resources are grouped.
-- Every project has its own billing, IAM roles, and API settings.
-- You can have multiple projects under the same billing account.
+### Key Features of a Project:
+- **Unique Project ID** (immutable)  
+- **Project Name** (editable)  
+- **Billing association**  
+- **IAM roles & permissions**  
+- **APIs & services enabled per project**  
+- **Quotas and limits** applied per project  
 
-Use-case:
-- One project for payments team.
-- Another for shipment team.
+### Why Projects?
+- Provides **isolation** between workloads (security, IAM, billing).  
+- Allows **multi-project strategy**:
+  - Separate projects for **teams** (e.g., Payments, Logistics).  
+  - Separate projects for **environments** (Dev, Staging, Prod).  
+- Easier **cost tracking and auditing**.  
 
 ---
 
 ## Billing Accounts in GCP
 
-When you signed up for the free tier, a billing account was automatically created and linked to your default project.
+A **Billing Account** defines **who pays for resources** inside projects.  
 
-Important points:
-- A single billing account can be linked to multiple projects.
-- If your free credits expire, charges will start applying only if you manually upgrade.
+### Types of Billing Accounts:
+1. **Free Trial**:  
+   - ₹22,500 (~$300) credits, valid for 90 days.  
+   - Auto-created during signup.  
+2. **Self-Service**:  
+   - Linked to credit/debit card.  
+   - Pay-as-you-go.  
+3. **Invoiced**:  
+   - For enterprises with contracts.  
+
+### Important Points:
+- One **Billing Account** → can link to **multiple projects**.  
+- One **Project** → linked to **only one billing account at a time**.  
+- Projects can be **moved between billing accounts**.  
+- Costs are calculated **per project**, then aggregated under billing account.  
+- If **free credits expire**, charges apply only if you **manually upgrade**.  
 
 ---
 
 ## Task 1: Create a New Project
 
-1. Go to the GCP Console: https://console.cloud.google.com
-2. From the top bar, click on the project dropdown
-3. Click **New Project**
-4. Give it a name like `gcp-zero-to-hero`
-5. Select your billing account and create
+1. Go to [GCP Console](https://console.cloud.google.com)  
+2. From the top bar, click on the **Project dropdown**  
+3. Click **New Project**  
+4. Enter name → Example: `gcp-zero-to-hero`  
+5. Select billing account → Click **Create**  
 
-This is the project we will use for all future labs.
+👉 This project will be used for all future labs.  
 
 ---
 
 ## Task 2: Set Budget Alerts
 
-Budget alerts help you track usage and avoid surprises.
+Budget alerts help you **track usage and avoid unexpected charges**.  
 
-Steps:
+### Steps:
+1. Go to **Billing → Budgets & Alerts**  
+2. Click **Create Budget**  
+3. Enter budget limit (e.g., ₹1000)  
+4. Configure email alerts at:  
+   - **50% usage** (early warning)  
+   - **90% usage** (critical warning)  
+   - **100% usage** (full budget exhausted)  
 
-1. Go to Billing → Budgets & alerts
-2. Click **Create Budget**
-3. Set a budget limit (example: ₹1000)
-4. Configure email alerts at 50%, 90%, and 100%
-
-Note: These are just alerts. GCP won't stop services automatically.
+⚠️ **Note**: Budgets are **alerts only**. GCP will **not auto-stop** services.  
+👉 To enforce hard limits: Use **Budgets + Pub/Sub + Cloud Functions** to shut down resources automatically.  
 
 ---
 
 ## Task 3: Enable APIs for Core Services
 
-APIs must be enabled before you can use many GCP services.
+In GCP, **APIs are disabled by default** for security and cost reasons.  
+You must **enable APIs** before using services.  
 
-Recommended APIs to enable now:
+### Why Enable APIs?
+- APIs provide the **backend endpoints** for Console, SDKs, `gcloud`, Terraform.  
+- Without enabling → service calls will fail.  
 
-- Compute Engine API
-- Cloud Storage API
-- Cloud Logging API
-- Cloud Monitoring API
-- Cloud Resource Manager API
-- IAM Service Account Credentials API
+### Recommended Core APIs to Enable:
+- **Compute Engine API** → Create/manage Virtual Machines.  
+- **Cloud Storage API** → Buckets & object storage.  
+- **Cloud Logging API** → Store/view logs from services.  
+- **Cloud Monitoring API** → Collect metrics & create alerts.  
+- **Cloud Resource Manager API** → Manage org, folders, and projects.  
+- **IAM Service Account Credentials API** → Manage service account tokens & keys.  
 
-Steps:
+### Steps:
+1. Go to **APIs & Services → Library**  
+2. Search each API by name → Click **Enable**  
 
-1. Go to **APIs & Services → Library**
-2. Search each API by name and click **Enable**
-
-Alternatively, use Cloud Shell:
+**Or enable via Cloud Shell**:
 
 ```bash
-gcloud services enable compute.googleapis.com \
-    storage.googleapis.com \
-    monitoring.googleapis.com \
-    logging.googleapis.com \
-    cloudresourcemanager.googleapis.com \
-    iamcredentials.googleapis.com
-```
+gcloud services enable \
+  compute.googleapis.com \
+  storage.googleapis.com \
+  logging.googleapis.com \
+  monitoring.googleapis.com \
+  cloudresourcemanager.googleapis.com \
+  iamcredentials.googleapis.com
